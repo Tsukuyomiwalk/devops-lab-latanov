@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# macOS system files
+ehthumbs.db
+Thumbs.db
+
+# General IDE/editor settings (рекомендуется хранить локально)
+.vscode/
+.idea/
+*.swp
+*.swo
+

@@ -1,7 +1,6 @@
 ## DevOps Lab — Latanov Daniil
 
 University: [ITMO University](https://itmo.ru/)
-Faculty: [FICT](https://fict.itmo.ru/)
 Course: [Введение в веб технологии](https://itmo-ict-faculty.github.io/introduction-in-web-tech/)
 Year: 2025/2026
 Group: U4125
@@ -112,7 +111,7 @@ Date of create: 10.03.2026
 
 7. **Проверил работу Docker volume**
 
-   Хотел убедиться, что данные действительно живут в томе, а не в контейнере:
+   Хотел убедиться, что данные действительно живут там, а не в контейнере:
 
    ```bash
    docker volume create my-volume
@@ -156,7 +155,6 @@ if __name__ == "__main__":
 
 ```
 Flask==2.0.1
-Werkzeug==2.0.3
 ```
 
 **2. Описал контейнер в Dockerfile**
@@ -275,6 +273,9 @@ curl http://localhost:5001
 
    После этого workflow может логиниться в Docker Hub без того, чтобы пароль светился в коде.
 
+   На скрине видно, что оба секрета добавлены именно в этот репозиторий:  
+   ![Секреты DOCKER_USERNAME и DOCKER_PASSWORD в GitHub](screenshots/add_vars.png)
+
 4. **Сделал обычный коммит и пуш в `main`, чтобы триггернуть пайплайн**
 
    ```bash
@@ -294,7 +295,12 @@ curl http://localhost:5001
    - образ собрался и был отправлен в репозиторий `…/my-flask-app:latest`;
    - шаг Deploy вывел своё сообщение.
 
-   (При желании сюда можно добавить скриншот с UI Actions, но пока оставил текстовое описание.)
+   Скрины:
+
+   - общий список запусков workflow с зелёным статусом последнего билда:  
+     ![Список запусков Docker Build and Push](screenshots/all_workflows.png)
+   - подробности успешного билда с галочками на всех шагах:  
+     ![Успешный прогон job build-and-push](screenshots/last_build.png)
 
 6. **Проверил, что образ реально появился в Docker Hub**
 

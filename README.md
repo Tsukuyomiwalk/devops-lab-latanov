@@ -469,3 +469,99 @@ curl http://localhost:5001
 - добавлен источник данных Prometheus в Grafana;
 - создан дашборд с метриками CPU, памяти и диска;
 - система мониторинга работает корректно, метрики собираются и визуализируются.
+
+---
+
+### Курсовая работа. Создание персонального сайта с использованием MkDocs
+
+#### Описание
+
+Собрал персональный сайт на MkDocs с темой Material: обо мне, опыте, проектах и контактах.  
+Сайт разворачивается локально и может быть выложен на GitHub Pages.
+
+#### Структура проекта
+
+- `my-personal-site/mkdocs.yml` — конфигурация MkDocs и темы Material  
+- `my-personal-site/docs/index.md` — главная страница  
+- `my-personal-site/docs/about.md` — страница «О себе»  
+- `my-personal-site/docs/projects.md` — страница «Проекты»  
+- `my-personal-site/docs/contacts.md` — страница «Контакты»
+
+#### Ход работы
+
+1. **Подготовка и установка**
+
+   - Проверил Python и pip:
+
+     ```bash
+     python3 --version
+     pip3 --version
+     ```
+
+   - Установил MkDocs и тему Material:
+
+     ```bash
+     pip3 install --break-system-packages mkdocs mkdocs-material
+     mkdocs --version
+     ```
+
+2. **Создание и настройка проекта**
+
+   - Создал каталог и базовый проект:
+
+     ```bash
+     mkdir -p my-personal-site
+     cd my-personal-site
+     mkdocs new .
+     ```
+
+   - Настроил `mkdocs.yml`:
+     - `site_name`, `site_description`, `site_author`
+     - тему `material`, язык `ru`
+     - палитру (indigo + amber) и переключатель тёмной/светлой темы
+     - навигацию: Главная, О себе, Проекты, Контакты
+     - social‑иконки GitHub и Telegram
+
+3. **Создал контент страниц**
+
+   - **Главная (`index.md`)** — краткое описание, чем занимаюсь, где работал, таблица быстрых ссылок.  
+     Скрин:  
+     ![MkDocs главная](screenshots/mkdocs_index.png)
+
+   - **О себе (`about.md`)** — образование (ИТМО, ШАД), опыт (OzonTech, VK, Overnight.fi), навыки и хобби, блок «Чего хочу добиться» с фокусом на LLM‑research.  
+     Скрин:  
+     ![Страница О себе](screenshots/mkdocs_about.png)
+
+   - **Проекты (`projects.md`)** — несколько проектов: оптимизация складов в OzonTech, ETL & мониторинг в VK, Twitter‑агент, DevOps Lab, CV‑курсовые и сам сайт на MkDocs.  
+     Скрин:  
+     ![Страница Проекты](screenshots/mkdocs_projects.png)
+
+   - **Контакты (`contacts.md`)** — таблица с email, Telegram `@okniceok`, GitHub, блок с локацией (Пхукет) и подсказкой, когда лучше писать.  
+     Скрин:  
+     ![Страница Контакты](screenshots/mkdocs_contacts.png)
+
+4. **Сборка и запуск**
+
+   - Локальное тестирование:
+
+     ```bash
+     cd my-personal-site
+     mkdocs serve -a 127.0.0.1:8000
+     ```
+
+     Сайт открывается по адресу `http://127.0.0.1:8000/devops-lab-latanov/`.
+
+   - Сборка статики:
+
+     ```bash
+     mkdocs build
+     ```
+
+     Статические файлы попадают в папку `site/`.
+
+#### Результаты курсовой работы
+
+- Рабочий сайт на MkDocs + Material с 4 разделами (главная, о себе, проекты, контакты);
+- Настроенная навигация, тёмная/светлая тема, поиск;
+- Структурированный контент на Markdown (заголовки, списки, таблицы, цитаты, эмодзи);
+- Сайт собирается локально и готов к публикации на GitHub Pages.

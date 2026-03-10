@@ -1,0 +1,7 @@
+.git
+.github
+screenshots
+prometheus
+__pycache__
+*.pyc
+.env

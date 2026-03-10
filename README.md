@@ -154,7 +154,7 @@ if __name__ == "__main__":
 Файл `requirements.txt`:
 
 ```
-Flask==2.0.1
+Flask==2.0.1 
 ```
 
 **2. Описал контейнер в Dockerfile**

@@ -15,7 +15,7 @@ Date of create: 10.03.2026
 
 #### Описание
 
-Первая лабораторная работа по изучению основ контейнеризации с использованием Docker.
+Первая лабораторная по Docker: разбираюсь с базовыми командами, контейнерами, образами и томами.
 
 #### Цель работы
 
@@ -23,211 +23,117 @@ Date of create: 10.03.2026
 
 #### Ход работы
 
-**1. Docker Desktop уже установлен**
+1. **Проверил, что Docker живой**
 
-```
-$ docker --version
-Docker version 28.5.1, build e180ab8
-```
+   В терминале в корне проекта запустил базовые команды, чтобы убедиться, что Docker установлен и демон запущен:
 
-**2. Локальные образы**
+   - `docker --version`
+   - `docker images`
+   - `docker ps`
+   - `docker ps -a`
 
-```
-$ docker images
-REPOSITORY             TAG         IMAGE ID       CREATED        SIZE
-grafana/grafana        latest      e932bd6ed0e0   25 hours ago   950MB
-prom/prometheus        latest      4a61322ac110   12 days ago    494MB
-prom/node-exporter     latest      3ac34ce007ac   4 months ago   39.5MB
-```
+   Скрин с моим терминалом:  
+   ![Проверка Docker и базовых команд](screenshots/docker_version.png)  
+   ![Образы и контейнеры до начала работы](screenshots/images_docker.png)  
+   ![ps/ps -a с моим пользователем](screenshots/ps_docker.png)
 
-**3. Список запущенных контейнеров**
+2. **Запустил самый простой контейнер `hello-world`**
 
-```
-$ docker ps
-CONTAINER ID   IMAGE                COMMAND       CREATED      STATUS      PORTS
-```
+   Просто проверка, что контейнеры вообще стартуют:
 
-**4. Список всех контейнеров**
+   ```bash
+   docker run hello-world
+   ```
 
-```
-$ docker ps -a
-CONTAINER ID   IMAGE                COMMAND       CREATED      STATUS
-```
+   На скрине видно стандартный текст `Hello from Docker!` и мой терминал:  
+   ![Запуск hello-world](screenshots/hello_world.png)
 
-**5. Запустил тестовый контейнер hello-world**
+3. **Скачал Ubuntu и внутри контейнера поставил `curl`**
 
-```
-$ docker run hello-world
+   - сначала подтянул образ:
 
-Hello from Docker!
-This message shows that your installation appears to be working correctly.
+     ```bash
+     docker pull ubuntu:latest
+     ```
 
-To generate this message, Docker took the following steps:
- 1. The Docker client contacted the Docker daemon.
- 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
- 3. The Docker daemon created a new container from that image which runs the
-    executable that produces the output you are currently reading.
- 4. The Docker daemon streamed that output to the Docker client, which sent it
-    to your terminal.
-```
+   - потом запустил контейнер и внутри поставил `curl`, чтобы убедиться, что всё работает:
 
-**6. Скачал образ Ubuntu**
+     ```bash
+     docker run ubuntu bash -c "apt update && apt install -y curl && curl --version"
+     ```
 
-```
-$ docker pull ubuntu:latest
-latest: Pulling from library/ubuntu
-66a4bbbfab88: Pull complete
-Digest: sha256:d1e2e92c075e5ca139d51a140fff46f84315c0fdce203eab2807c7e495eff4f9
-Status: Downloaded newer image for ubuntu:latest
-docker.io/library/ubuntu:latest
-```
+   Скрин:  
+   ![pull ubuntu и установка curl внутри контейнера](screenshots/docker_pull.png)
 
-**7. Запустил интерактивно контейнер и установил пакет curl**
+4. **Поднял nginx и проверил, что он отдает стартовую страницу**
 
-```
-$ docker run -it ubuntu bash
-root@container:/# apt update && apt install -y curl
-...
-curl 8.5.0 (aarch64-unknown-linux-gnu) libcurl/8.5.0 OpenSSL/3.0.13 zlib/1.3
-Release-Date: 2023-12-06
-Protocols: dict file ftp ftps gopher gophers http https imap imaps ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp
-Features: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd
-```
+   - запускаю nginx в контейнере:
 
-**8. Запустил контейнер с nginx (так как образа не было, он скачался)**
+     ```bash
+     docker run -d -p 8080:80 --name web-server nginx:alpine
+     docker ps
+     ```
 
-```
-$ docker run -d -p 8080:80 --name web-server nginx:alpine
-Unable to find image 'nginx:alpine' locally
-alpine: Pulling from library/nginx
-da8475fa07c7: Pull complete
-c5ad07fbd6e6: Pull complete
-821790ca706f: Pull complete
-7833e4e4252c: Pull complete
-88799a707571: Pull complete
-31d394b0c9ed: Pull complete
-9084d2ffc283: Pull complete
-Digest: sha256:1d13701a5f9f3fb01aaa88cef2344d65b6b5bf6b7d9fa4cf0dca557a8d7702ba
-Status: Downloaded newer image for nginx:alpine
-65f3b045e544...
-```
+   - в браузере открываю `http://localhost:8080` и вижу стандартный экран “Welcome to nginx!”.
 
-**9. Проверил работу на локальном хосте, все корректно**
+   Скрины:
 
-![Nginx welcome page](screenshots/lab1_nginx.png)
+   - терминал с запуском контейнера:  
+     ![Запуск контейнера с nginx](screenshots/nginx_docker_run.png)
+   - браузер с главной страницей nginx:  
+     ![Nginx welcome page](screenshots/lab1_nginx.png)
 
-**10. По логам видно успешное выполнение get запроса**
+5. **Посмотрел логи nginx и залез внутрь контейнера**
 
-```
-$ docker logs web-server
-/docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
-/docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
-/docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
-10-listen-on-ipv6-by-default.sh: info: Getting the checksum of /etc/nginx/conf.d/default.conf
-10-listen-on-ipv6-by-default.sh: info: Enabled listen on IPv6 in /etc/nginx/conf.d/default.conf
-/docker-entrypoint.sh: Sourcing /docker-entrypoint.d/15-local-resolvers.envsh
-/docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
-/docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
-/docker-entrypoint.sh: Configuration complete; ready for start up
-2026/03/10 10:09:41 [notice] 1#1: nginx/1.29.5
-2026/03/10 10:09:41 [notice] 1#1: OS: Linux 6.10.14-linuxkit
-2026/03/10 10:09:41 [notice] 1#1: start worker processes
-```
+   Здесь просто проверил, что nginx нормально стартует и что я могу зайти внутрь контейнера:
 
-**11. Подключился к контейнеру и выполнил команду ls**
+   ```bash
+   docker logs web-server
+   docker exec -it web-server ls /
+   ```
 
-```
-$ docker exec -it web-server ls /
-bin  dev  docker-entrypoint.d  docker-entrypoint.sh  etc  home  lib  media  mnt
-opt  proc  root  run  sbin  srv  sys  tmp  usr  var
-```
+   Скрин с логами и `ls /` внутри контейнера:  
+   ![Логи nginx и exec в контейнер](screenshots/logs_exec_docker.png)
 
-**12. Список запущенных контейнеров (добавился nginx)**
+6. **Потренировался управлять контейнером: stop/start/rm и удаление образа**
 
-```
-$ docker ps
-NAMES           IMAGE                STATUS              PORTS
-web-server      nginx:alpine         Up About a minute   0.0.0.0:8080->80/tcp
-grafana         grafana/grafana      Up 27 minutes       0.0.0.0:3000->3000/tcp
-prometheus      prom/prometheus      Up 27 minutes       0.0.0.0:9090->9090/tcp
-node-exporter   prom/node-exporter   Up 28 minutes       0.0.0.0:9100->9100/tcp
-```
+   Последовательно остановил контейнер, снова запустил, ещё раз остановил, потом удалил и почистил образ:
 
-**13. Список всех контейнеров**
+   ```bash
+   docker stop web-server
+   docker start web-server
+   docker stop web-server
+   docker rm web-server
+   docker rmi nginx:alpine
+   ```
 
-```
-$ docker ps -a
-NAMES                   IMAGE                  STATUS
-web-server              nginx:alpine           Up About a minute
-zen_mayer               ubuntu                 Exited (0) About a minute ago
-blissful_fermi          hello-world            Exited (0) 2 minutes ago
-grafana                 grafana/grafana        Up 27 minutes
-prometheus              prom/prometheus        Up 27 minutes
-node-exporter           prom/node-exporter     Up 28 minutes
-```
+   Всё это зафиксировано на отдельном скрине:  
+   ![Управление контейнером nginx](screenshots/docker_controls.png)
 
-**14. Остановил, запустил и снова остановил контейнер web-server, удалил контейнер и образ**
+7. **Проверил работу Docker volume**
 
-```
-$ docker stop web-server
-web-server
+   Хотел убедиться, что данные действительно живут в томе, а не в контейнере:
 
-$ docker start web-server
-web-server
+   ```bash
+   docker volume create my-volume
+   docker run -d -it --name volume-test -v my-volume:/data ubuntu bash
+   docker exec volume-test bash -c 'echo "Hello from volume" > /data/test.txt && cat /data/test.txt'
+   docker rm -f volume-test
 
-$ docker stop web-server
-web-server
+   docker run -d -it --name volume-test2 -v my-volume:/data ubuntu bash
+   docker exec volume-test2 bash -c 'ls /data && cat /data/test.txt'
+   docker rm -f volume-test2
+   docker volume rm my-volume
+   ```
 
-$ docker rm web-server
-web-server
-
-$ docker rmi nginx:alpine
-Untagged: nginx:alpine
-Deleted: sha256:1d13701a5f9f...
-```
-
-**15. Создал том, запустил контейнер с томом, подключился к контейнеру, создал файл в томе**
-
-```
-$ docker volume create my-volume
-my-volume
-
-$ docker run -d -it --name volume-test -v my-volume:/data ubuntu bash
-94d5b6dff983...
-
-$ docker exec -it volume-test bash
-root@94d5b6dff983:/# echo "Hello from volume" > /data/test.txt
-root@94d5b6dff983:/# cat /data/test.txt
-Hello from volume
-```
-
-**16. Удалил контейнер и создал новый с тем же томом**
-
-```
-$ docker rm -f volume-test
-volume-test
-
-$ docker run -d -it --name volume-test2 -v my-volume:/data ubuntu bash
-3d388a72e334...
-```
-
-**17. В контейнере запустил команду ls, далее cat для проверки содержимого файла**
-
-```
-$ docker exec volume-test2 ls /data/
-test.txt
-
-$ docker exec volume-test2 cat /data/test.txt
-Hello from volume
-```
-
-Файл сохранился после удаления контейнера — том работает корректно.
+   На скрине видно, что файл `test.txt` никуда не пропал после пересоздания контейнера:  
+   ![Проверка volume и сохранения файла](screenshots/volume_docker.png)
 
 ---
 
 #### Лабораторная работа со звёздочкой
 
-**1. Создал файлы проекта**
+**1. Собрал маленькое Flask‑приложение**
 
 Файл `app.py`:
 
@@ -253,7 +159,7 @@ Flask==2.0.1
 Werkzeug==2.0.3
 ```
 
-**2. Создал Dockerfile**
+**2. Описал контейнер в Dockerfile**
 
 ```dockerfile
 FROM python:3.9-slim
@@ -279,29 +185,18 @@ EXPOSE 5000
 CMD ["python", "app.py"]
 ```
 
-**3. Собрал образ**
+**3. Собрал образ и проверил, что он реально работает**
 
-```
-$ docker build -t my-flask-app .
-#1 [internal] load build definition from Dockerfile
-...
-#9 [5/7] RUN pip install --no-cache-dir -r requirements.txt
-#9 Collecting Flask==2.0.1
-#9   Downloading Flask-2.0.1-py3-none-any.whl (94 kB)
-#9 Successfully installed Flask-2.0.1 Jinja2-3.1.6 MarkupSafe-3.0.3 Werkzeug-2.0.3 click-8.1.8 itsdangerous-2.2.0
-...
-#12 naming to docker.io/library/my-flask-app:latest done
+Выполнил команды:
+
+```bash
+docker build -t my-flask-app .
+docker run -d -p 5001:5000 --name flask-container my-flask-app
+curl http://localhost:5001
 ```
 
-**4. Запустил контейнер и проверил работу**
-
-```
-$ docker run -d -p 5001:5000 --name flask-container my-flask-app
-cc002b21912a...
-
-$ curl http://localhost:5001
-Hello from Docker!
-```
+На скрине видно и процесс сборки, и запуск контейнера, и ответ `Hello from Docker!` прямо в моём терминале:  
+![Сборка образа и запуск Flask-приложения в контейнере](screenshots/flask_docker.png)
 
 #### Результаты лабораторной работы
 
@@ -319,7 +214,7 @@ Hello from Docker!
 
 #### Описание
 
-Вторая лабораторная работа по настройке CI/CD пайплайна для автоматической сборки, публикации и деплоя Docker образа из первой лабораторной работы.
+Во второй лабе я подключаю автоматизацию: на каждый пуш в `main` мой Docker‑образ с Flask‑приложением собирается и улетает в Docker Hub.
 
 #### Цель работы
 
@@ -327,73 +222,84 @@ Hello from Docker!
 
 #### Ход работы
 
-**1. Создал аккаунт на Docker Hub и репозиторий**
+1. **Завёл репозиторий на Docker Hub под своё приложение**
 
-Создан репозиторий на Docker Hub для хранения Docker-образов.
+   В Docker Hub создал отдельный репозиторий под образ Flask‑приложения. Логин использую тот же, что и в GitHub (для удобства).
 
-**2. Создал папку `.github/workflows/` и файл `docker-build.yml` с пайплайном**
+2. **Настроил GitHub Actions: создал `.github/workflows/docker-build.yml`**
 
-```yaml
-name: Docker Build and Push
+   В репозитории добавил папку `.github/workflows/` и внутри файл `docker-build.yml`.  
+   В нём один джоб, который крутится на `ubuntu-latest` и делает всё по шагам:
 
-on:
-  push:
-    branches: [ main ]
+   ```yaml
+   name: Docker Build and Push
 
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
+   on:
+     push:
+       branches: [ main ]
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+   jobs:
+     build-and-push:
+       runs-on: ubuntu-latest
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+       steps:
+         - name: Checkout code
+           uses: actions/checkout@v4
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+         - name: Set up Docker Buildx
+           uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/my-flask-app:latest
+         - name: Login to Docker Hub
+           uses: docker/login-action@v3
+           with:
+             username: ${{ secrets.DOCKER_USERNAME }}
+             password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Deploy
-        run: echo "Deploying to production server..."
-```
+         - name: Build and push Docker image
+           uses: docker/build-push-action@v5
+           with:
+             context: .
+             push: true
+             tags: ${{ secrets.DOCKER_USERNAME }}/my-flask-app:latest
 
-**3. В настройках репозитория добавил секреты, которые используются в `docker-build.yml`**
+         - name: Deploy
+           run: echo "Deploying to production server..."
+   ```
 
-В разделе Settings → Secrets and variables → Actions добавлены:
-- `DOCKER_USERNAME` — логин Docker Hub
-- `DOCKER_PASSWORD` — пароль/токен Docker Hub
+3. **Подключил секреты для логина в Docker Hub**
 
-**4. Сделал коммит и пуш в ветку main**
+   В настройках репозитория GitHub (Settings → Secrets and variables → Actions) завёл два секрета:
 
-```
-$ git add .
-$ git commit -m "Add Dockerfile, Flask app, CI/CD workflow, Prometheus monitoring"
-$ git push origin main
-```
+   - `DOCKER_USERNAME` — мой логин на Docker Hub;
+   - `DOCKER_PASSWORD` — пароль или access‑token.
 
-**5. Выполнение пайплайна в Actions**
+   После этого workflow может логиниться в Docker Hub без того, чтобы пароль светился в коде.
 
-После пуша в main автоматически запустился пайплайн GitHub Actions, который:
-- Выполнил checkout кода
-- Настроил Docker Buildx
-- Залогинился в Docker Hub
-- Собрал и запушил образ с тегом `username/my-flask-app:latest`
-- Вывел сообщение о деплое
+4. **Сделал обычный коммит и пуш в `main`, чтобы триггернуть пайплайн**
 
-**6. Образ на Docker Hub**
+   ```bash
+   git add .
+   git commit -m "Add Dockerfile, Flask app, CI/CD workflow, Prometheus monitoring"
+   git push origin main
+   ```
 
-Образ `my-flask-app:latest` успешно опубликован в Docker Hub.
+5. **Посмотрел, как отработал пайплайн в GitHub Actions**
+
+   Вкладка Actions в репозитории → выбрал последний workflow run.  
+   По шагам видно, что:
+
+   - код успешно checkout‑нулся;
+   - Buildx поднялся без ошибок;
+   - логин в Docker Hub прошёл;
+   - образ собрался и был отправлен в репозиторий `…/my-flask-app:latest`;
+   - шаг Deploy вывел своё сообщение.
+
+   (При желании сюда можно добавить скриншот с UI Actions, но пока оставил текстовое описание.)
+
+6. **Проверил, что образ реально появился в Docker Hub**
+
+   В Docker Hub в репозитории вижу новый тег `latest` для `my-flask-app`.  
+   При необходимости можно стянуть его командой `docker pull username/my-flask-app:latest` и запустить на любой машине.
 
 #### Результаты лабораторной работы
 
@@ -408,7 +314,7 @@ $ git push origin main
 
 #### Описание
 
-Третья лабораторная работа по настройке системы мониторинга с использованием Prometheus для сбора метрик и Grafana для визуализации данных.
+В третьей лабе собираю локальный стенд мониторинга: Prometheus тянет метрики с node‑exporter, а Grafana рисует красивые графики по этим данным.
 
 #### Цель работы
 
@@ -416,142 +322,136 @@ $ git push origin main
 
 #### Ход работы
 
-**1. Создал файл `prometheus/prometheus.yml` с информацией о частоте сбора метрик, метриками Prometheus и метриками системы**
+1. **Описал, что именно будет мониторить Prometheus**
 
-```yaml
-global:
-  scrape_interval: 15s
+   В корне проекта создал папку `prometheus` и внутри файл `prometheus.yml`.  
+   В нём задал интервал сбора и два job’а: сам Prometheus и node‑exporter:
 
-scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['localhost:9090']
+   ```yaml
+   global:
+     scrape_interval: 15s
 
-  - job_name: 'node-exporter'
-    static_configs:
-      - targets: ['node-exporter:9100']
-```
+   scrape_configs:
+     - job_name: 'prometheus'
+       static_configs:
+         - targets: ['localhost:9090']
 
-**2. Запустил контейнер Node Exporter и проверил его работу**
+     - job_name: 'node-exporter'
+       static_configs:
+         - targets: ['node-exporter:9100']
+   ```
 
-```
-$ docker run -d \
-  --name node-exporter \
-  --restart=unless-stopped \
-  -p 9100:9100 \
-  prom/node-exporter
-a46e43e22c02...
+2. **Поднял node‑exporter и посмотрел “сырые” метрики**
 
-$ curl http://localhost:9100/metrics
-# HELP go_gc_duration_seconds A summary of the wall-time pause duration...
-# TYPE go_gc_duration_seconds summary
-go_gc_duration_seconds{quantile="0"} 0
-go_gc_duration_seconds{quantile="0.25"} 0
-...
-```
+   Запустил контейнер с node‑exporter и убедился, что по HTTP реально отдаются метрики:
 
-**3. Создал том `prometheus-data`, для работы с Grafana создал общую сеть `monitoring`**
+   ```bash
+   docker run -d \
+     --name node-exporter \
+     --restart=unless-stopped \
+     -p 9100:9100 \
+     prom/node-exporter
 
-```
-$ docker volume create prometheus-data
-prometheus-data
+   curl http://localhost:9100/metrics | head
+   ```
 
-$ docker network create monitoring
-cc06abe2eed6...
+   В ответе видно стандартные метрики Go и системы (`go_gc_duration_seconds`, `go_goroutines` и т.д.).
 
-$ docker network connect monitoring node-exporter
-```
+3. **Подготовил данные и сеть для Prometheus и Grafana**
 
-**4. Запустил контейнер Prometheus**
+   - отдельный volume для данных Prometheus;
+   - отдельная Docker‑сеть, куда я потом подключаю все сервисы:
 
-```
-$ docker run -d \
-  --name prometheus \
-  --network monitoring \
-  --restart=unless-stopped \
-  -p 9090:9090 \
-  -v prometheus-data:/prometheus \
-  -v $(pwd)/prometheus:/etc/prometheus \
-  prom/prometheus \
-  --config.file=/etc/prometheus/prometheus.yml \
-  --storage.tsdb.path=/prometheus \
-  --web.console.libraries=/etc/prometheus/console_libraries \
-  --web.console.templates=/etc/prometheus/consoles \
-  --storage.tsdb.retention.time=200h \
-  --web.enable-lifecycle
-26240d08be5f...
-```
+   ```bash
+   docker volume create prometheus-data
+   docker network create monitoring
+   docker network connect monitoring node-exporter
+   ```
 
-**5. Работа Prometheus на локальном хосте**
+4. **Запустил Prometheus и проверил, что он жив**
 
-Открыл `http://localhost:9090` в браузере:
+   ```bash
+   docker run -d \
+     --name prometheus \
+     --network monitoring \
+     --restart=unless-stopped \
+     -p 9090:9090 \
+     -v prometheus-data:/prometheus \
+     -v $(pwd)/prometheus:/etc/prometheus \
+     prom/prometheus \
+     --config.file=/etc/prometheus/prometheus.yml \
+     --storage.tsdb.path=/prometheus \
+     --web.console.libraries=/etc/prometheus/console_libraries \
+     --web.console.templates=/etc/prometheus/consoles \
+     --storage.tsdb.retention.time=200h \
+     --web.enable-lifecycle
+   ```
 
-![Prometheus главная страница](screenshots/prometheus_main.png)
+   После старта открыл `http://localhost:9090` и увидел стандартный интерфейс Prometheus:  
+   ![Prometheus главная страница](screenshots/prometheus_main.png)
 
-**6. Создал том `grafana-data` и запустил контейнер Grafana**
+5. **Поднял Grafana для визуализации**
 
-```
-$ docker volume create grafana-data
-grafana-data
+   Создал отдельный volume под данные Grafana и запустил контейнер в той же сети `monitoring`:
 
-$ docker run -d \
-  --name grafana \
-  --network monitoring \
-  --restart=unless-stopped \
-  -p 3000:3000 \
-  -v grafana-data:/var/lib/grafana \
-  -e "GF_SECURITY_ADMIN_PASSWORD=admin" \
-  grafana/grafana
-ee9578eb745b...
-```
+   ```bash
+   docker volume create grafana-data
 
-**7. На локальном хосте Grafana работает**
+   docker run -d \
+     --name grafana \
+     --network monitoring \
+     --restart=unless-stopped \
+     -p 3000:3000 \
+     -v grafana-data:/var/lib/grafana \
+     -e "GF_SECURITY_ADMIN_PASSWORD=admin" \
+     grafana/grafana
+   ```
 
-Открыл `http://localhost:3000` в браузере:
+   В браузере открыл `http://localhost:3000` и залогинился под `admin/admin`:  
+   ![Grafana страница входа](screenshots/grafana_login.png)
 
-![Grafana страница входа](screenshots/grafana_login.png)
+6. **Сконнектил Grafana с Prometheus**
 
-**8. Залогинился под админом в Grafana, далее добавил источник данных Prometheus**
+   В Grafana зашёл в **Connections → Data sources**, добавил новый источник данных Prometheus и указал URL `http://prometheus:9090` (контейнеры в одной сети, поэтому именно hostname `prometheus`).
 
-- Configuration → Data Sources → Add data source
-- Выбрал Prometheus
-- URL: `http://prometheus:9090`
-- Save & Test
+   После `Save & Test` источник стал зелёным:  
+   ![Grafana источники данных](screenshots/grafana_datasources.png)
 
-![Grafana источники данных](screenshots/grafana_datasources.png)
+7. **Проверил в Prometheus, что таргеты реально `UP`**
 
-**9. В Prometheus проверил доступность node-exporter**
+   На странице `Status → Targets` видно два таргета:
 
-Оба таргета (node-exporter и prometheus) в статусе UP:
+   - `node-exporter:9100`;
+   - `localhost:9090` (сам Prometheus).
 
-![Prometheus targets](screenshots/prometheus_targets.png)
+   Оба в состоянии `UP`:  
+   ![Prometheus targets](screenshots/prometheus_targets.png)
 
-**10. Добавил метрики `node_cpu_seconds_total`, `node_memory_Active_bytes`, `node_memory_MemAvailable_bytes`, `node_disk_io_now`**
+8. **Собрал свой дашборд в Grafana**
 
-Создал дашборд "Node Exporter Metrics" с четырьмя графиками:
-- CPU Usage (`node_cpu_seconds_total`)
-- Memory Active (`node_memory_Active_bytes`)
-- Memory Available (`node_memory_MemAvailable_bytes`)
-- Disk I/O (`node_disk_io_now`)
+   Создал дашборд `Node Exporter Metrics` и добавил туда 4 графика:
 
-![Grafana дашборд с метриками](screenshots/grafana_dashboard.png)
+   - CPU Usage — `rate(node_cpu_seconds_total{mode!="idle"}[5m])`;
+   - Memory Active — `node_memory_Active_bytes`;
+   - Memory Available — `node_memory_MemAvailable_bytes`;
+   - Disk I/O — `node_disk_io_now`.
 
-**11. Проверка контейнеров**
+   На скрине видно, что графики рисуются и метрики приходят:  
+   ![Grafana дашборд с метриками](screenshots/grafana_dashboard.png)
 
-```
-$ docker ps
-NAMES           IMAGE                STATUS          PORTS
-grafana         grafana/grafana      Up              0.0.0.0:3000->3000/tcp
-prometheus      prom/prometheus      Up              0.0.0.0:9090->9090/tcp
-node-exporter   prom/node-exporter   Up              0.0.0.0:9100->9100/tcp
-```
+9. **Убедился, что все контейнеры живы**
 
-**12. Метрики собираются, данные визуализируются**
+   В терминале:
 
-Система мониторинга полностью настроена и функционирует:
-- Node Exporter собирает системные метрики (CPU, память, диск)
-- Prometheus агрегирует метрики от Node Exporter и собственные метрики
-- Grafana визуализирует данные на дашборде с четырьмя графиками
+   ```bash
+   docker ps
+   ```
+
+   В списке вижу три контейнера:
+
+   - `grafana` на порту `3000`;
+   - `prometheus` на `9090`;
+   - `node-exporter` на `9100`.
 
 #### Результаты лабораторной работы
 

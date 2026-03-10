@@ -1,7 +1,6 @@
 ## DevOps Lab — Latanov Daniil
 
 University: [ITMO University](https://itmo.ru/)
-Faculty: [FICT](https://fict.itmo.ru/)
 Course: [Введение в веб технологии](https://itmo-ict-faculty.github.io/introduction-in-web-tech/)
 Year: 2025/2026
 Group: U4125
@@ -112,7 +111,7 @@ Date of create: 10.03.2026
 
 7. **Проверил работу Docker volume**
 
-   Хотел убедиться, что данные действительно живут в томе, а не в контейнере:
+   Хотел убедиться, что данные действительно живут там, а не в контейнере:
 
    ```bash
    docker volume create my-volume
@@ -156,7 +155,6 @@ if __name__ == "__main__":
 
 ```
 Flask==2.0.1
-Werkzeug==2.0.3
 ```
 
 **2. Описал контейнер в Dockerfile**
